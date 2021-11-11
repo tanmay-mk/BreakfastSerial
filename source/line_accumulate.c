@@ -1,7 +1,18 @@
+/************************************************************************************************
+PES Assignment 6
+File Name: line_accumulate.c
+Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-mk
+		Alexander G. Dean
+*************************************************************************************************/
+
+/*	LIBRARY FILES	*/
 #include <stdio.h>
+#include <stdint.h>
+
+/*	OTHER FILES TO BE INCLUDED	*/
 #include "line_accumulate.h"
 #include "command_process.h"
-#include <stdint.h>
+
 
 void accumulate_line(void)
 {
@@ -9,14 +20,17 @@ void accumulate_line(void)
 	uint8_t buffer[80];
 	uint8_t bp = 0;
 
-	//receive
-	while((c != '\r' ) && (c != '\n')){
+	while((c != '\r' ) && (c != '\n'))
+	{
 		c = getchar();
-		if(c == '\b'){
-			bp--;
+		if(c == '\b')		//check for backspace
+		{
+			bp--;			//if backspace is present, overwrite
 			printf("\b \b");
-		}else{
-			sprintf((char *) buffer+bp,(char *) &c);//try putchar
+		}
+		else
+		{
+			sprintf((char *) buffer+bp,(char *) &c);
 			bp++;
 			printf("%c",(char)c);
 		}

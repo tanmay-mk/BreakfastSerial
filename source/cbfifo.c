@@ -1,21 +1,21 @@
 /************************************************************************************************
-PES Assignment 2
+PES Assignment 6
 File Name: cbfifo.c
-Author: Tanmay Mahendra Kothale
-
-GCC Version: 6.3.0 (MinGW.org GCC-6.3.0-1)
-IDE: CodeBlocks
+Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-mk
 *************************************************************************************************/
 
-#include "cbfifo.h"
+/*	LIBRARY FILES	*/
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#define BUFFER_SIZE 256
+/*	OTHER FILES TO BE INCLUDED	*/
+#include "cbfifo.h"
 
-uint32_t i;
+/*	MACROS	*/
+#define BUFFER_SIZE 256				//max size of the circular buffer
 
+/*	STRUCTURE TO IMPLEMENT MULTIPLE INSTANCES OF CBFIFO	*/
 typedef struct {
 	uint32_t bufferLength;
 	uint32_t readLocation;
@@ -23,7 +23,9 @@ typedef struct {
 	uint8_t circularBuffer[BUFFER_SIZE];
 }cbfifo;
 
-cbfifo fifo[2];
+/*	GLOBAL VARIABLES	*/
+cbfifo fifo[2];		//array of structure to implement multiple instances of cbfifo
+uint32_t i;			//loop variable
 
 size_t cbfifo_capacity(int buf_type)
 {

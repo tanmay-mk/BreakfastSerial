@@ -1,24 +1,70 @@
+/************************************************************************************************
+PES Assignment 6
+File Name: command_process.c
+Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-mk
+		Howdy Pierce - howdy.pierce@colorado.edu
+*************************************************************************************************/
 
-#include "command_process.h"
+/* 	LIBRARY FILES	*/
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+
+/* 	OTHER FILES TO BE INCLUDED	*/
+#include "command_process.h"
 #include "hexdump.h"
 
+/*	GENERIC PROTOTYPE FOR HANDLE FUNCTIONS*/
 typedef void (*cmd_handler_t)(int, char * argv[]);
 
-static void author_handler(int, char * argv[]);
-static void dump_handler(int, char * argv[]);
-static void help_handler(int ,char * argv[]);
-static void info_handler(int ,char * argv[]);
-
+/*		STRUCTURE OF COMMANDS AND THEIR DATA	*/
 typedef struct{
 	const char *cmd_name;
 	cmd_handler_t handler;
 	const char * help_string;
 }cmd_table_t;
 
+/*	HANDLER FUNCTION PROTOTYPES	*/
+
+/*
+ * @brief: 		this function is called when user types
+ * 				"author" in the command terminal.
+ *
+ * @returns: 	none
+ */
+static void author_handler	(int argc, char * argv[]);
+
+/*
+ * @brief: 		this function is called when user types
+ * 				"dump" in the command terminal. Prints
+ * 				the hexdump of requested byte from specific
+ * 				memory location.
+ *
+ * @returns: 	none
+ */
+static void dump_handler	(int argc, char * argv[]);
+
+/*
+ * @brief: 		this function is called when user types
+ * 				"help" in the command terminal. Prints
+ * 				the brief of all the commands available
+ * 				to the user.
+ *
+ * @returns: 	none
+ */
+static void help_handler	(int argc, char * argv[]);
+
+/*
+ * @brief: 		this function is called when user types
+ * 				"info" in the command terminal. Prints
+ * 				the build info of the program.
+ *
+ * @returns: 	none
+ */
+static void info_handler	(int argc, char * argv[]);
+
+/*	TABLE OF COMMANDS EXECUTED IN RESPONSE TO THE USER INPUT 	*/
 static const cmd_table_t commands[] = {
 		{"author",author_handler,"Prints the name of the Author\r\n"},
 		{"dump",dump_handler,"Print a dump of memory represented as hex values. Write dump <start address> <length of dump>\n\r"},
@@ -26,7 +72,7 @@ static const cmd_table_t commands[] = {
 		{"info",info_handler,"Prints the build info\r\n"}
 };
 
-static const int cmd_nos = sizeof(commands) / sizeof(cmd_table_t);
+static const int cmd_nos = sizeof(commands) / sizeof(cmd_table_t);	//computing number of commands
 
 void process_command(char *input)
 {
@@ -34,33 +80,45 @@ void process_command(char *input)
 	char *argv[10];
 	int argc = 0;
 
-	bool command = false;
+	bool command = false;						//variable to check whether a command
+												//is present or not
 
 	char *p = input;
 	char *end;
 
-	for(end=input ; *end!= '\0' ; end++)
+	for(end=input ; *end!= '\0' ; end++)		//computing the end of the string
 		;
-	memset(argv,0,sizeof(argv));
+	memset(argv,0,sizeof(argv)); 				//setting argv[] to 0
 
 	for(p = input; p < end; p++){
 
 		switch(in_token){
 
 		case false:
+
+			/*
+			 * @brief: if the token state is false, we check for a valid character
+			 * 			if we find a valid character, we look for first available white space,
+			 * 			LF, CR or TAB.
+			 */
 			if(
 					((*p>='a')&&(*p<='z')) ||
 					((*p>='A')&&(*p<='Z')) ||
 					((*p>='0')&&(*p<='9'))
 			  )
 			{
-				argv[argc] = p;
-				argc++;
-				in_token = true;
+				argv[argc] = p;		//storing the word in argv
+				argc++;				//incrementing argc index
+				in_token = true;	//advance to next state
 			}
 
 		break;
 		case true:
+
+			/*
+			 * @brief: in this state, we check for the first available white space,
+			 * 			LF, CR, TAB, and then replace the character with null character.
+			 */
 			if(
 					(*p == ' ')  ||
 					(*p == '\t') ||
@@ -69,7 +127,7 @@ void process_command(char *input)
 			  )
 			{
 				*p = '\0';
-				in_token = false;
+				in_token = false;		//advance to previous state
 			}
 
 		break;

@@ -1,5 +1,14 @@
+/************************************************************************************************
+PES Assignment 6
+File Name: uart.c
+Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-mk
+		Alexander G. Dean
+*************************************************************************************************/
 
-#include "MKL25Z4.h"
+/*	LIBRARY FILES	*/
+#include <MKL25Z4.h>
+
+/*	OTHER FILES TO BE INCLUDED	*/
 #include "uart.h"
 
 void Init_UART0(uint32_t baud_rate) {
@@ -44,7 +53,6 @@ void Init_UART0(uint32_t baud_rate) {
 	// Send LSB first, do not invert received data
 	UART0->S2 = UART0_S2_MSBF(0) | UART0_S2_RXINV(0);
 
-#if UART_INTERRUPTS
 	// Enable interrupts. Listing 8.11 on p. 234
 
 	NVIC_SetPriority(UART0_IRQn, 2); // 0, 1, 2, or 3
@@ -54,7 +62,6 @@ void Init_UART0(uint32_t baud_rate) {
 	// Enable receive interrupts but not transmit interrupts yet
 	UART0->C2 |= UART_C2_RIE(1);
 	//UART0->C2 |= UART_C2_TIE(1);//enable for test-dont do this here
-#endif
 
 	// Enable UART receiver and transmitter
 	UART0->C2 |= UART0_C2_RE(1) | UART0_C2_TE(1);
@@ -66,7 +73,13 @@ void Init_UART0(uint32_t baud_rate) {
 	if (temp) {}
 
 }
-
+/*
+ * @brief: ISR Routine of UART0
+ *
+ * @parameters: none
+ *
+ * @returns: none
+ */
 void UART0_IRQHandler(void) {
 
 	uint8_t ch;
@@ -98,7 +111,14 @@ void UART0_IRQHandler(void) {
 			UART0->C2 &= ~UART0_C2_TIE_MASK;
 	}
 }
-
+/*
+ * @brief: This function gets called everytime there is
+ * 			a call to printf or equivalent function
+ *
+ * @parameters: none
+ *
+ * @returns: none
+ */
 int __sys_write(int handle, char * buf, int size){
 
 	while(cbfifo_length(TRANSMIT) == cbfifo_capacity(TRANSMIT))//if tx_buff full wait
@@ -116,17 +136,25 @@ int __sys_write(int handle, char * buf, int size){
 	return 0;//success
 }
 
+/*
+ * @brief: This function gets called everytime there is
+ * 			a call to getchar or equivalent function
+ *
+ * @parameters: none
+ *
+ * @returns: none
+ */
 int __sys_readc(void){
 
-	int c;
+	int character;
 
 	while(cbfifo_length(RECEIVE)==0)
 			;
 
-	if(cbfifo_dequeue(RECEIVE,&c,1))//some data in rx
-		return c;
+	if(cbfifo_dequeue(RECEIVE,&c,1))
+		{return character;}
 	else
-		return -1;
+		{return -1;}
 
 }
 
