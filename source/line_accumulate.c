@@ -30,14 +30,15 @@ void accumulate_line(void)
 		}
 		else
 		{
-			sprintf((char *) buffer+bp,(char *) &c);
+			buffer[bp] = c;
 			bp++;
 			printf("%c",(char)c);
 		}
 	}
+	buffer[bp] = '\0';
 	printf("\r\n");
 	bp = 0;
 	process_command((char *)buffer);
-	printf("? ");
+	printf("\n\r? ");
 	c = 0;
 }

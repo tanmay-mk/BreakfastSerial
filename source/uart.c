@@ -121,7 +121,7 @@ void UART0_IRQHandler(void) {
  */
 int __sys_write(int handle, char * buf, int size){
 
-	while(cbfifo_length(TRANSMIT) == cbfifo_capacity(TRANSMIT))//if tx_buff full wait
+	while(cbfifo_length(TRANSMIT) == cbfifo_capacity(TRANSMIT))
 		;
 
 	while(*buf != '\0'){
@@ -151,10 +151,14 @@ int __sys_readc(void){
 	while(cbfifo_length(RECEIVE)==0)
 			;
 
-	if(cbfifo_dequeue(RECEIVE,&c,1))
-		{return character;}
+	if(cbfifo_dequeue(RECEIVE,&character,1))
+		{
+			return character;
+		}
 	else
-		{return -1;}
+		{
+			return -1;
+		}
 
 }
 

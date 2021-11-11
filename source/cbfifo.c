@@ -8,6 +8,7 @@ Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-m
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <MKL25Z4.h>
 
 /*	OTHER FILES TO BE INCLUDED	*/
 #include "cbfifo.h"
@@ -39,6 +40,7 @@ size_t cbfifo_length(int buf_type)
 
 size_t cbfifo_enqueue(int buf_type, void *buf, size_t nbyte)
 {
+	uint32_t masking_state;
     size_t TOTAL_BYTES_ENQUEUED=0;              //a variable to check the number of bytes enqueued in one enqueue cycle
     if (fifo[buf_type].bufferLength == BUFFER_SIZE)
     {
@@ -57,6 +59,8 @@ size_t cbfifo_enqueue(int buf_type, void *buf, size_t nbyte)
                                                 //will be discarded
     else {}
 
+    masking_state = __get_PRIMASK();
+    __disable_irq();
     for (i=0; i<nbyte; i++)
     {
     	fifo[buf_type].circularBuffer[fifo[buf_type].writeLocation] = *(char*) buf;        //writing element in the buffer
@@ -70,11 +74,13 @@ size_t cbfifo_enqueue(int buf_type, void *buf, size_t nbyte)
         	fifo[buf_type].writeLocation = 0;
         }
     }
+    __set_PRIMASK(masking_state);
     return TOTAL_BYTES_ENQUEUED;                            //returning the total number of bytes enqueued in this cycle
 }
 
 size_t cbfifo_dequeue(int buf_type, void *buf, size_t nbyte)
 {
+	uint32_t masking_state;
     size_t TOTAL_BYTES_DEQUEUED=0;                           //a variable to check the number of bytes dequeued in one queue cycle
 
     if (buf == NULL)                                         //if no data is encountered, the function returns -1
@@ -94,6 +100,8 @@ size_t cbfifo_dequeue(int buf_type, void *buf, size_t nbyte)
 
     else{}
 
+    masking_state = __get_PRIMASK();
+    __disable_irq();
     for (i=0; i<nbyte; i++)
     {
         *(char *) buf = fifo[buf_type].circularBuffer[fifo[buf_type].readLocation];             //removing the element from the buffer
@@ -107,6 +115,7 @@ size_t cbfifo_dequeue(int buf_type, void *buf, size_t nbyte)
         	fifo[buf_type].readLocation = 0;
         }
     }
+    __set_PRIMASK(masking_state);
     return TOTAL_BYTES_DEQUEUED;
 }
 

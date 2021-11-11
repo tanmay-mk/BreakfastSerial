@@ -166,11 +166,6 @@ void dump_handler(int a, char * argv[])
 	else
 		{sscanf(argv[2],"%d",&len);}
 
-	if(len>640){
-		printf("Length out of range.Enter length between 1 to 640 or 0x01 to 0x280\r\n");
-		return;
-	}
-
 	hexdump(start,len);
 }
 
