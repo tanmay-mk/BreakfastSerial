@@ -18,7 +18,7 @@ void hexdump(uint32_t start_address, uint32_t length)
 	for(int i=0;i<length;i +=16 ){
 
 		//printing the address
-		printf("%04X_%04X ",((start_address+i)>>16), (start_address+i) & 0xFFFF);
+		printf("%04X_%04X ",((start_address+i)>>16), (start_address+i));
 
 		for(int j = 0 ; j < 16 ; j++){
 

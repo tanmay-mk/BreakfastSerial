@@ -55,21 +55,12 @@ static void dump_handler	(int argc, char * argv[]);
  */
 static void help_handler	(int argc, char * argv[]);
 
-/*
- * @brief: 		this function is called when user types
- * 				"info" in the command terminal. Prints
- * 				the build info of the program.
- *
- * @returns: 	none
- */
-static void info_handler	(int argc, char * argv[]);
 
 /*	TABLE OF COMMANDS EXECUTED IN RESPONSE TO THE USER INPUT 	*/
 static const cmd_table_t commands[] = {
 		{"author",author_handler,"Prints the name of the Author\r\n"},
 		{"dump",dump_handler,"Print a dump of memory represented as hex values. Write dump <start address> <length of dump>\n\r"},
 		{"help",help_handler,"Print this help message\r\n"},
-		{"info",info_handler,"Prints the build info\r\n"}
 };
 
 static const int cmd_nos = sizeof(commands) / sizeof(cmd_table_t);	//computing number of commands
@@ -149,12 +140,12 @@ void process_command(char *input)
 	 if(!command) {printf("Invalid command: %s\r\n",argv[0]);}
 }
 
-void author_handler(int a, char * argv[])
+static void author_handler(int a, char * argv[])
 {
 	printf("Tanmay Mahendra Kothale\n\rtanmay.kothale@colorado.edu\n\rGitHub: tanmay-mk\r\n");
 }
 
-void dump_handler(int a, char * argv[])
+static void dump_handler(int a, char * argv[])
 {
 	uint32_t len = 0;
 	uint32_t start = 0;
@@ -169,20 +160,13 @@ void dump_handler(int a, char * argv[])
 	hexdump(start,len);
 }
 
-void help_handler(int argc,char * argv[])
+static void help_handler(int argc,char * argv[])
 {
-	printf("author\r\n");
+	printf("1. author\r\n");
 	printf("%s",commands[0].help_string);
-	printf("dump\r\n");
+	printf("2. dump\r\n");
 	printf("%s",commands[1].help_string);
-	printf("help\r\n");
+	printf("3. help\r\n");
 	printf("%s",commands[2].help_string);
-	printf("info\r\n");
-	printf("%s",commands[3].help_string);
-}
-
-void info_handler(int argc,char * argv[])
-{
-
 }
 

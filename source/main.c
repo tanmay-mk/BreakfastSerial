@@ -4,17 +4,17 @@ File Name: main.c
 Author: Tanmay Mahendra Kothale - tanmay.kothale@colorado.edu - GitHub: tanmay-mk
 		Howdy Pierce - howdy.pierce@colorado.edu
 *************************************************************************************************/
-
+/*	LIBRARY FILES	*/
 #include <stdint.h>
 #include <stdio.h>
 #include <MKL25Z4.h>
 
+/*	OTHER FILES TO BE INCLUDED	*/
 #include "test_cbfifo.h"
-#include "command_process.h"
 #include "line_accumulate.h"
 #include "sysclock.h"
 #include "uart.h"
-#include "cbfifo.h"
+
 
 /*
  * @brief: 	application entry point
