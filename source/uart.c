@@ -1,24 +1,7 @@
-/***********************************************************************************************************************
-* File Name    : uart.c
-* Project      : PES Assignment 6
-* Version      : 1.0
-* Description  : Contains all the function implementation code along with variable definitions for uart module
-* Author       : Vishal Raj & referred from Dean chp 8-https://github.com/alexander-g-dean/ESF/tree/master/NXP/Code/
-* 				 Chapter_8/Serial-Demo.
-* Creation Date: 11.10.21
-***********************************************************************************************************************/
+
 #include "MKL25Z4.h"
 #include "uart.h"
 
-//cbfifo_t *rx_fifo = &rx;
-//cbfifo_t *tx_fifo = &tx;
-
-/***********************************************************************************************
-* Name			   : Init_UART0
-* Description 	   : used to initialize uart module.
-* Parameters 	   : baud rate of uart required
-* RETURN 		   : None
-***********************************************************************************************/
 void Init_UART0(uint32_t baud_rate) {
 	uint16_t sbr;
 	uint8_t temp;
@@ -80,14 +63,10 @@ void Init_UART0(uint32_t baud_rate) {
 	temp = UART0->D;
 	UART0->S1 &= ~UART0_S1_RDRF_MASK;
 
+	if (temp) {}
+
 }
 
-/***********************************************************************************************
-* Name			   : UART0_IRQHandler
-* Description 	   : ISR for UART.
-* Parameters 	   : None
-* RETURN 		   : None
-***********************************************************************************************/
 void UART0_IRQHandler(void) {
 
 	uint8_t ch;
@@ -99,15 +78,9 @@ void UART0_IRQHandler(void) {
 			// read the data register to clear RDRF
 			ch = UART0->D;
 	}
-	if (UART0->S1 & UART0_S1_RDRF_MASK) {//read interrupt
-		// received a character
+	if (UART0->S1 & UART0_S1_RDRF_MASK) {
 		ch = UART0->D;
-		//		if (!Q_Full(&RxQ)) {
-		//			Q_Enqueue(&RxQ, ch);
-		//		} else {
-		//			// error - queue full.
-		//			// discard character
-		//		}
+
 		if(!(cbfifo_capacity(RECEIVE) == cbfifo_length(RECEIVE))){
 			cbfifo_enqueue(RECEIVE,&ch,1);
 		}else {
@@ -118,12 +91,6 @@ void UART0_IRQHandler(void) {
 	}
 	if ( (UART0->C2 & UART0_C2_TIE_MASK) && (UART0->S1 & UART0_S1_TDRE_MASK) ) { // tx buffer empty
 		// can send another character
-//		if (!Q_Empty(&TxQ)) {
-//			UART0->D = Q_Dequeue(&TxQ);
-//		} else {
-//			// queue is empty so disable transmitter interrupt
-//			UART0->C2 &= ~UART0_C2_TIE_MASK;
-//		}
 		if(cbfifo_length(TRANSMIT)!=0){//not empty
 			 cbfifo_dequeue(TRANSMIT, &ch_tx, 1);
 			 UART0->D = ch_tx;
@@ -131,12 +98,7 @@ void UART0_IRQHandler(void) {
 			UART0->C2 &= ~UART0_C2_TIE_MASK;
 	}
 }
-/***********************************************************************************************
-* Name			   : __sys_write
-* Description 	   : glue function for tying uart write with stdio functions in redlib.
-* Parameters 	   : handle for stdio or stderr, buffer to be printed and upto size bytes
-* RETURN 		   : 0 for success and -1 on error
-***********************************************************************************************/
+
 int __sys_write(int handle, char * buf, int size){
 
 	while(cbfifo_length(TRANSMIT) == cbfifo_capacity(TRANSMIT))//if tx_buff full wait
@@ -146,7 +108,6 @@ int __sys_write(int handle, char * buf, int size){
 		cbfifo_enqueue(TRANSMIT,buf,1);
 		buf++;
 	}
-	//put error case
 
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
 		UART0->C2 |= UART0_C2_TIE(1);
@@ -154,12 +115,7 @@ int __sys_write(int handle, char * buf, int size){
 
 	return 0;//success
 }
-/***********************************************************************************************
-* Name			   : __sys_readc
-* Description 	   : glue function for tying uart read with stdio functions in redlib.
-* Parameters 	   : None
-* RETURN 		   : no of characters or -1 if nothing is there to be read
-***********************************************************************************************/
+
 int __sys_readc(void){
 
 	int c;
@@ -174,4 +130,3 @@ int __sys_readc(void){
 
 }
 
-/*[EOF]*/

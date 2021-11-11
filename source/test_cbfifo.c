@@ -31,8 +31,6 @@ void test_cbfifo()
   char buf[1024];
   const int cap = cbfifo_capacity(TRANSMIT);
 
-  // asserts in following 2 lines -- this is not testing the student,
-  // it's validating that the test is correct
   assert(strlen(str) >= cap*2);
   assert(sizeof(buf) > cap);
   assert(cap == 256 || cap == 255);

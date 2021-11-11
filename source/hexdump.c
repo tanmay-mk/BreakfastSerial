@@ -3,20 +3,18 @@
 #include <stdio.h>
 
 
-void hexdump(uint32_t start, uint32_t len)
+void hexdump(uint32_t start_address, uint32_t length)
 {
 
-	uint8_t * start_addr =(uint8_t *) start;
+	uint8_t * start_addr =(uint8_t *) start_address;
 
-	for(int i=0;i<len;i +=16 ){
+	for(int i=0;i<length;i +=16 ){
 
-		printf("%04X",((start+i)>>16));
-		printf("_");
-		printf("%04X	",((start+i) & 0xFFFF));
+		printf("%04X_%04X ",((start_address+i)>>16), (start_address+i) & 0xFFFF);
 
 		for(int j = 0 ; j < 16 ; j++){
 
-			if(i+j > len){
+			if(i+j > length){
 				printf("\n\r");
 				return;
 			}

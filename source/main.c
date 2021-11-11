@@ -7,19 +7,21 @@
 #include "MKL25Z4.h"
 #include "test_cbfifo.h"
 #include "command_process.h"
+#include "line_accumulate.h"
 
 int main(void)
 {
   sysclock_init();
   Init_UART0(38400);
-  test_cbfifo();//Test cbfifo once
+  test_cbfifo();
 
-  	printf("Welcome to BreakfastSerial!\r\n");
-  	printf("? ");
-	while (1) {
-		accumulator();
-	}
+  printf("Welcome to BreakfastSerial!\r\n");
+  printf("? ");
+  while (1)
+  {
+	accumulate_line();
+  }
 
   return 0 ;
 }
-/*[EOF]*/
+

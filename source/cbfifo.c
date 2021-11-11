@@ -13,14 +13,6 @@ IDE: CodeBlocks
 #include <stdio.h>
 
 #define BUFFER_SIZE 256
-//unsigned char circularBuffer [128];             //original buffer in which the data will be copied
-//unsigned char dequeuedElements [1024];          //a string in which all dequeued elements are dumped
-//
-//uint32_t readLocation=0, writeLocation=0;       //holds read location and write location of the circular buffer
-//
-//uint32_t bufferLength=0;                        //holds total number of elements ready to be dequeued
-//
-//size_t BUFFER_SIZE = 128;                       //total capacity of the buffer
 
 uint32_t i;
 

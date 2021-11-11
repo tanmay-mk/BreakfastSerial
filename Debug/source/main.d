@@ -6,7 +6,8 @@ source/main.o source/main.d: ../source/main.c ../source/sysclock.h \
  C:\Users\tanma\Documents\MCUXpressoIDE_11.2.0_4120\PES_Assignments\BreakfastSerial\CMSIS/cmsis_gcc.h \
  C:\Users\tanma\Documents\MCUXpressoIDE_11.2.0_4120\PES_Assignments\BreakfastSerial\CMSIS/core_cmFunc.h \
  C:\Users\tanma\Documents\MCUXpressoIDE_11.2.0_4120\PES_Assignments\BreakfastSerial\CMSIS/system_MKL25Z4.h \
- ../source/test_cbfifo.h ../source/command_process.h
+ ../source/test_cbfifo.h ../source/command_process.h \
+ ../source/line_accumulate.h
 
 ../source/sysclock.h:
 
@@ -29,3 +30,5 @@ C:\Users\tanma\Documents\MCUXpressoIDE_11.2.0_4120\PES_Assignments\BreakfastSeri
 ../source/test_cbfifo.h:
 
 ../source/command_process.h:
+
+../source/line_accumulate.h:

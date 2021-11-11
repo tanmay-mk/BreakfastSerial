@@ -6,8 +6,12 @@
 #include <stdbool.h>
 #include "hexdump.h"
 
-//variable definitions
 typedef void (*cmd_handler_t)(int, char * argv[]);
+
+static void author_handler(int, char * argv[]);
+static void dump_handler(int, char * argv[]);
+static void help_handler(int ,char * argv[]);
+static void info_handler(int ,char * argv[]);
 
 typedef struct{
 	const char *cmd_name;
@@ -16,95 +20,62 @@ typedef struct{
 }cmd_table_t;
 
 static const cmd_table_t commands[] = {
-		//command table entries here
-		{"author",author_handler,"Print the author of this code\r\n"},
-		{"dump",dump_handler,"Output a hexdump starting at location loc.\r\n\tAlways specify loc in hex; specify len in hex (\"0XNN\") or dec (\"NN\")\r\n"},
+		{"author",author_handler,"Prints the name of the Author\r\n"},
+		{"dump",dump_handler,"Print a dump of memory represented as hex values. Write dump <start address> <length of dump>\n\r"},
 		{"help",help_handler,"Print this help message\r\n"},
-		{"info",info_handler,"Print various build info\r\n"}
+		{"info",info_handler,"Prints the build info\r\n"}
 };
 
 static const int cmd_nos = sizeof(commands) / sizeof(cmd_table_t);
-/***********************************************************************************************
-* Name			   : accumulator
-* Description 	   : used to accumulate input line from user.
-* Parameters 	   : None
-* RETURN 		   : None
-***********************************************************************************************/
-void accumulator(void)
-{
-	uint8_t c=0;
-	uint8_t user_input[80];
-	uint8_t ip_idx = 0;
 
-	//receive
-	while((c != '\r' ) && (c != '\n')){
-		c = getchar();
-		if(c == '\b'){
-			ip_idx--;
-			printf("\b \b");
-		}else{
-			sprintf((char *) user_input+ip_idx,(char *) &c);//try putchar
-			ip_idx++;
-			printf("%c",(char)c);
-		}
-	}
-	printf("\r\n");
-	ip_idx = 0;
-	//printf("String entered:%s\r\n",user_input);
-	process_cmd((char *)user_input);
-	printf("? ");
-	c = 0;//reset for next cycle
-}
-/***********************************************************************************************
-* Name			   : process_cmd
-* Description 	   : Processes user input in seperate words
-* Parameters 	   : User input line to be processed
-* RETURN 		   : None
-***********************************************************************************************/
-void process_cmd(char *input)
+void process_command(char *input)
 {
-	bool token = false;
+	bool in_token = false;
 	char *argv[10];
 	int argc = 0;
+
+	bool command = false;
 
 	char *p = input;
 	char *end;
 
-	uint8_t valid_cmd = 0;
-
-	//find the end of string
 	for(end=input ; *end!= '\0' ; end++)
 		;
 	memset(argv,0,sizeof(argv));
 
-	//lexical analysis
 	for(p = input; p < end; p++){
 
-		switch(token){
+		switch(in_token){
 
-		case false:{
-			if(((*p>='a')&&(*p<='z')) || ((*p>='A')&&(*p<='Z')) || ((*p>='0')&&(*p<='9'))){
+		case false:
+			if(
+					((*p>='a')&&(*p<='z')) ||
+					((*p>='A')&&(*p<='Z')) ||
+					((*p>='0')&&(*p<='9'))
+			  )
+			{
 				argv[argc] = p;
 				argc++;
-				token = true;
+				in_token = true;
 			}
-		}
+
 		break;
-		case true:{
-			if(*p == ' '){//space found
+		case true:
+			if(
+					(*p == ' ')  ||
+					(*p == '\t') ||
+					(*p == '\n') ||
+					(*p == '\r')
+			  )
+			{
 				*p = '\0';
-				token = false;
+				in_token = false;
 			}
-			if(p == end-3){//if last character received,ignoring \r&\n
-				*p = '\0';
-				token = false;
-			}
-		}
+
 		break;
 		}
 	}
 	if(argc == 0){//no command found
-		printf("No command found!\r\n");
 		return;
 	}
 
@@ -112,45 +83,30 @@ void process_cmd(char *input)
 	for (int i=0; i < cmd_nos; i++) {
 	    if (strcasecmp(argv[0], commands[i].cmd_name) == 0) {
 	      commands[i].handler(argc, argv);
-	      valid_cmd = 1;
+	      command = true;
 	      break;
 	    }
+
 	  }
-
-	//print error message if no proper command received from user
-	if(!valid_cmd)
-		printf("Unknown command: %s\r\n",argv[0]);
-
+	 if(!command) {printf("Invalid command: %s\r\n",argv[0]);}
 }
-/***********************************************************************************************
-* Name			   : author_handler
-* Description 	   : author handler function
-* Parameters 	   : argc, argv
-* RETURN 		   : None
-***********************************************************************************************/
+
 void author_handler(int a, char * argv[])
 {
-	printf("Vishal Raj\r\n");
+	printf("Tanmay Mahendra Kothale\n\rtanmay.kothale@colorado.edu\n\rGitHub: tanmay-mk\r\n");
 }
 
-/***********************************************************************************************
-* Name			   : dump_handler
-* Description 	   : dump handler function
-* Parameters 	   : argc, argv
-* RETURN 		   : None
-***********************************************************************************************/
 void dump_handler(int a, char * argv[])
 {
 	uint32_t len = 0;
 	uint32_t start = 0;
 
-	//start = string_to_hex((char*)argv[1]);
 	sscanf(argv[1],"%x",&start);
 
 	if(strstr((char*)argv[2],"0x") || strstr((char*)argv[2],"0X"))//if input is in hex
-		sscanf(argv[2],"%x",&len);//len = string_to_hex(((char*)argv[2])+2);//ignore 0x in argv[2]
+		{sscanf(argv[2],"%x",&len);}
 	else
-		sscanf(argv[2],"%d",&len);
+		{sscanf(argv[2],"%d",&len);}
 
 	if(len>640){
 		printf("Length out of range.Enter length between 1 to 640 or 0x01 to 0x280\r\n");
@@ -160,31 +116,20 @@ void dump_handler(int a, char * argv[])
 	hexdump(start,len);
 }
 
-/***********************************************************************************************
-* Name			   : help_handler
-* Description 	   : help handler function
-* Parameters 	   : argc, argv
-* RETURN 		   : None
-***********************************************************************************************/
 void help_handler(int argc,char * argv[])
 {
-	printf("author\r\n\t");
+	printf("author\r\n");
 	printf("%s",commands[0].help_string);
-	printf("dump <loc><len>\r\n\t");
+	printf("dump\r\n");
 	printf("%s",commands[1].help_string);
-	printf("help\r\n\t");
+	printf("help\r\n");
 	printf("%s",commands[2].help_string);
-	printf("info\r\n\t");
-	printf("%s",commands[2].help_string);
+	printf("info\r\n");
+	printf("%s",commands[3].help_string);
 }
-/***********************************************************************************************
-* Name			   : info_handler
-* Description 	   : info handler function
-* Parameters 	   : argc, argv
-* RETURN 		   : None
-***********************************************************************************************/
+
 void info_handler(int argc,char * argv[])
 {
 
 }
-/*[EOF]*/
+
